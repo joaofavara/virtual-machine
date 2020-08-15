@@ -1,13 +1,12 @@
 <template>
   <div class='main'>
     <div class='menu'>
-      <button class='FILE'>FILE</button>
+      <input type="file" @change="previewFiles" class='FILE' />
       <button class='debug'>DEBUG</button>
       <button class='run'>RUN</button>
     </div>
 
     <div class='program'>
-
       <p class='title'>Program Stack</p>
       <Table :data='gridData' :columns='programColumns' />
     </div>
@@ -30,14 +29,17 @@
 
 <script>
 import Table from './Table.vue';
+import Mixin from '../mixin/mixin';
 
 export default {
   name: 'VirtualMachine',
+  mixins: [Mixin],
   components: {
     Table,
   },
   data() {
     return {
+      inputFile: '',
       inputData: '',
       allInputedData: [],
       programColumns: [
