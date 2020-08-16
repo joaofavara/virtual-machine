@@ -1,28 +1,40 @@
 <template>
   <div class='main'>
     <div class='menu'>
-      <input type="file" @change="previewFiles" class='FILE' />
       <button class='debug'>DEBUG</button>
       <button class='run'>RUN</button>
+      <input type="file" @change="previewFiles" class='file'>
     </div>
 
     <div class='program'>
       <p class='title'>Program Stack</p>
-      <Table :data='gridData' :columns='programColumns' />
+      <div class="content">
+        <Table :data='gridData' :columns='programColumns' />
+      </div>
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
-      <Table :data='gridData' :columns='dataColumns' />
+      <div class="content">
+        <Table :data='gridData' :columns='dataColumns' />
+      </div>
     </div>
     <div class='input'>
       <p class='title'>Input Area</p>
-      <input v-model="inputData" />
-      <button @click="addData">Go</button>
-      {{ inputData }}
-      {{ allInputedData }}
+      <div class="content">
+        <input v-model="inputData" />
+        <button @click="addData">Go</button>
+        <div class="show-data">
+          <span v-for="data in allInputedData" :key="data">{{ data }}</span>
+        </div>
+      </div>
     </div>
     <div class='output'>
       <p class='title'>Output Area</p>
+      <div class="content">
+        <div class="show-data">
+          <!-- Put the output data -->
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -68,50 +80,97 @@ export default {
 </script>
 
 <style lang='scss'>
+$gray: #D3D3D3;
+$blue: #E0FFFF;
+$red: #FFE4E1;
+$green: #F0FFF0;
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 
   .main {
     width: fit-content;
-    height: 90vh;
+    height: 95vh;
     display: grid;
     grid-gap: 20px;
     grid-template-rows: auto 1fr 1fr 1fr;
     grid-template-areas:
-      'menu       menu        menu'
+      'menu       .           .'
       'program    program     data'
       'program    program     data'
       'input      output      data';
 
     .program {
       grid-area: program;
-      border: 1px solid red;
     }
 
     .input {
       grid-area: input;
-      border: 1px solid blue;
+
+      .show-data {
+        margin-top: 10px;
+        background: white;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 125px;
+        overflow: auto;
+      }
     }
 
     .data {
       grid-area: data;
-      border: 1px solid green;
     }
 
     .output {
       grid-area: output;
-      border: 1px solid purple;
+
+      .show-data {
+        margin-top: 10px;
+        background: white;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 145px;
+        overflow: auto;
+      }
     }
 
     .menu {
       grid-area: menu;
-      border: 1px solid yellow;
+      display: flex;
+      justify-content: space-evenly;
+
+      input[type="file"]::-webkit-file-upload-button {
+        padding: 5px;
+        border-radius: 8px;
+        background-color: $green;
+      }
+
+      button {
+        padding: 5px;
+        border-radius: 8px;
+        &.run {
+          background-color: $blue;
+        }
+
+        &.debug {
+          background-color: $red;
+        }
+      }
     }
 
     .title {
+      background-color: $gray;
+      border-radius: 8px 8px 0 0;
       width: fit-content;
-      padding: 5px;
-      margin: 10px
+      padding: 8px;
+      margin: 0;
+    }
+
+    .content {
+      background-color: $gray;
+      padding: 10px;
     }
   }
 }
