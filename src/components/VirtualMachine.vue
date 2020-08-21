@@ -2,20 +2,19 @@
   <div class='main'>
     <div class='menu'>
       <button class='debug'>DEBUG</button>
-      <button class='run'>RUN</button>
+      <button class='run' @click="execute()">RUN</button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
-
     <div class='program'>
       <p class='title'>Program Stack</p>
       <div class="content">
-        <Table :data='gridData' :columns='programColumns' />
+        <Table :data='programData' :columns='programColumns' />
       </div>
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
       <div class="content">
-        <Table :data='gridData' :columns='dataColumns' />
+        <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
     <div class='input'>
@@ -41,6 +40,7 @@
 
 <script>
 import Table from './Table.vue';
+import TableStack from './TableStack.vue';
 import Mixin from '../mixin/mixin';
 
 export default {
@@ -48,6 +48,7 @@ export default {
   mixins: [Mixin],
   components: {
     Table,
+    TableStack,
   },
   data() {
     return {
@@ -55,18 +56,11 @@ export default {
       inputData: '',
       allInputedData: [],
       programColumns: [
-        'Posição',
-        'Instrução',
-        'Atributo #1',
-        'Atributo #2',
-        'Comentário',
-      ],
-      dataColumns: ['Endereço (S)', 'Valor'],
-      gridData: [
-        { name: 'Chuck Norris', power: Infinity },
-        { name: 'Bruce Lee', power: 9000 },
-        { name: 'Jackie Chan', power: 7000 },
-        { name: 'Jet Li', power: 8000 },
+        'posicao',
+        'instrucao',
+        'atributo1',
+        'atributo2',
+        'comentario',
       ],
     };
   },
@@ -102,6 +96,10 @@ body {
 
     .program {
       grid-area: program;
+      .content {
+        height: 220px;
+        overflow: auto;
+      }
     }
 
     .input {
@@ -169,8 +167,7 @@ body {
     }
 
     .content {
-      background-color: $gray;
-      padding: 10px;
+      border: $gray solid 10px;
     }
   }
 }
