@@ -231,10 +231,11 @@ const mixin = {
             const m = this.programData[this.i].atributo1;
             const n = this.programData[this.i].atributo2;
 
-            for (let K = 0; K < n - 1; K += 1) {
+            for (let K = 0; K < n; K += 1) {
               this.s += 1;
               this.stackData[this.s] = this.stackData[m + K];
             }
+            console.log(this.stackData);
             break;
           }
 
