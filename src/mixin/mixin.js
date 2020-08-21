@@ -267,7 +267,7 @@ const mixin = {
 
             for (let K = 0; K < n; K += 1) {
               this.s += 1;
-              this.stackData[this.s] = this.stackData[m + K];
+              this.stackData[this.s] = this.stackData[m + K] || 0;
             }
             this.i += 1;
             break;
