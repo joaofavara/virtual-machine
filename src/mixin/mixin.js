@@ -1,12 +1,14 @@
 /* eslint-disable max-len */
 // eslint-disable-next-line max-len
 
+// import { forEach } from 'core-js/fn/array';
+
 const mixin = {
   data() {
     return {
       commands: null,
-      i: 0,
-      s: 0,
+      i: 0, /* Indice da fila de comandos */
+      s: 0, /* Indice da pilha de dados */
       programColumns: [
         'posicao',
         'instrucao',
@@ -15,7 +17,7 @@ const mixin = {
         'comentario',
       ],
       programData: [],
-      stackData: [],
+      stackData: [], /* Pilha de dados */
       stackColumns: [
         'endereco',
         'valor',
@@ -55,217 +57,252 @@ const mixin = {
 
       reader.onloadend = async () => {
         this.commands = await reader.result.split('\n');
-        // console.log('this.commands2: ', this.commands);
         this.buildProgramData();
       };
     },
     execute(isInput) {
-      // let this.stackData; /* Pilha de dados */
-      // let i = 0; /* Indice da fila de comandos */
-      // let s = 0; /* Indice da pilha de dados */
       let loop = true;
-      // if (this.commands.split(' ').length > 2) {
-      //   return -1;
-      // }
-      if (isInput) {
-        this.stackData[this.s] = this.inputData;
-        // this.allInputedData.push(this.inputData);
-        // this.inputData = '';
-        this.addData();
+
+      if (isInput && this.inputData !== undefined) {
+        this.stackData[this.s] = parseInt(this.inputData, 10);
+        this.addInputedData();
       }
 
-      // this.programData.forEach((line) => {
-      while (this.i < this.programData.length && loop) {
+      while (loop && this.i < this.programData.length) {
+        console.log(`-- Linha ${this.i + 1} ---`);
+        console.log(`Ponteiro: ${this.s}`);
+        console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
+        console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
+        console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
+        console.log(this.stackData.flat());
+        console.log(`-- Linha ${this.i + 1} ---\n\n`);
+
         switch (this.programData[this.i].instrucao) {
           case 'LDC':
             this.s += 1;
-            this.stackData[this.s] = this.programData[this.i].atributo1;
+            this.stackData[this.s] = parseInt(this.programData[this.i].atributo1, 10);
+            this.i += 1;
             break;
 
           case 'LDV':
             this.s += 1;
-            this.stackData[this.s] = this.stackData[this.programData[this.i].atributo1];
+            this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].atributo1, 10)];
+            this.i += 1;
             break;
 
           case 'ADD':
             this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) + parseInt(this.stackData[this.s], 10);
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'SUB':
             this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) - parseInt(this.stackData[this.s], 10);
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'MULT':
             this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) * parseInt(this.stackData[this.s], 10);
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'DIVI':
             this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) / parseInt(this.stackData[this.s], 10);
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'INV':
             this.stackData[this.s] *= (-1);
+            this.i += 1;
             break;
 
           case 'AND':
             if (this.stackData[this.s - 1] === 1 && this.stackData[this.s] === 1) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'OR':
             if (this.stackData[this.s - 1] === 1 || this.stackData[this.s] === 1) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'NEG':
             this.stackData[this.s] = 1 - this.stackData[this.s];
+            this.i += 1;
             break;
 
           case 'CME':
             if (this.stackData[this.s - 1] < this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'CMA':
             if (this.stackData[this.s - 1] > this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'CEQ':
             if (this.stackData[this.s - 1] === this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'CDIF':
             if (this.stackData[this.s - 1] !== this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'CMEQ':
             if (this.stackData[this.s - 1] <= this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'CMAQ':
             if (this.stackData[this.s - 1] >= this.stackData[this.s]) {
               this.stackData[this.s - 1] = 1;
             } else {
-              this.stackData[this.s - 1] = -1;
+              this.stackData[this.s - 1] = 0;
             }
             this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'START':
             this.s = -1;
+            this.i += 1;
             break;
 
           case 'HLT':
-            break;
-
-          case 'STR':
-            this.stackData[this.programData[this.i].atributo1] = this.stackData[this.s];
-            this.s -= 1;
-            break;
-
-          case 'JMP':
-            this.i = this.programData[this.i].atributo1;
-            break;
-
-          case 'JMPF':
-            if (this.stackData[this.s] === 0) {
-              this.i = this.programData[this.i].atributo1;
-            } else {
-              this.i += 1;
-            }
-            break;
-
-          case 'NULL':
-            break;
-
-          case 'RD':
-            /* S = S + 1;
-            this.stackData[S] = "Entrada do teclado"; */
-            this.s += 1;
             loop = false;
             break;
 
-          case 'PRN':
-            /* Imprimir this.stackData[S] */
-            console.log(this.stackData[this.s]);
+          case 'STR':
+            this.stackData[parseInt(this.programData[this.i].atributo1, 10)] = this.stackData[this.s];
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'JMP': {
+            const label = this.programData[this.i].atributo1;
+            this.jump(label);
+            break;
+          }
+          case 'JMPF':
+            if (this.stackData[this.s] === 0) {
+              const label = this.programData[this.i].atributo1;
+              this.jump(label);
+            } else {
+              this.i += 1;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            break;
+
+          case 'RD':
             this.s += 1;
+            loop = false;
+            this.i += 1;
+            break;
+
+          case 'PRN':
+            this.addOutputedData(this.stackData[this.s]);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
             break;
 
           case 'ALLOC': {
-            const m = this.programData[this.i].atributo1;
-            const n = this.programData[this.i].atributo2;
+            const m = parseInt(this.programData[this.i].atributo1, 10);
+            const n = parseInt(this.programData[this.i].atributo2, 10);
 
-            for (let K = 0; K < n - 1; K += 1) {
+            for (let K = 0; K < n; K += 1) {
               this.s += 1;
               this.stackData[this.s] = this.stackData[m + K];
             }
+            this.i += 1;
             break;
           }
 
           case 'DALLOC': {
-            const m = this.programData[this.i].atributo1;
-            const n = this.programData[this.i].atributo2;
+            const m = parseInt(this.programData[this.i].atributo1, 10);
+            const n = parseInt(this.programData[this.i].atributo2, 10);
 
-            let K = n - 1;
-            for (K; K >= 0; K -= 1) {
+            for (let K = n - 1; K >= 0; K -= 1) {
               this.stackData[m + K] = this.stackData[this.s];
               this.s -= 1;
+              this.stackData.length -= 1;
             }
+            this.i += 1;
             break;
           }
 
-          case 'CALL':
+          case 'CALL': {
+            const label = this.programData[this.i].atributo1;
             this.s += 1;
             this.stackData[this.s] = this.i + 1;
-            this.i = this.programData[this.i].atributo1;
+            this.jump(label);
             break;
-
+          }
           case 'RETURN':
             this.i = this.stackData[this.s];
             this.s -= 1;
+            this.stackData.length -= 1;
             break;
 
           default:
+            this.i += 1;
             break;
         }
-        // });
-        this.i += 1;
       }
     },
   },

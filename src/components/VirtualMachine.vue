@@ -31,7 +31,7 @@
       <p class='title'>Output Area</p>
       <div class="content">
         <div class="show-data">
-          <!-- Put the output data -->
+          <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
         </div>
       </div>
     </div>
@@ -55,6 +55,7 @@ export default {
       inputFile: '',
       inputData: '',
       allInputedData: [],
+      allOutputedData: [],
       programColumns: [
         'posicao',
         'instrucao',
@@ -65,9 +66,19 @@ export default {
     };
   },
   methods: {
-    addData() {
+    addInputedData() {
       this.allInputedData.push(this.inputData);
       this.inputData = '';
+    },
+    addOutputedData(data) {
+      this.allOutputedData.push(data);
+    },
+    jump(label) {
+      this.programData.forEach((line) => {
+        if (label === line.instrucao) {
+          this.i = this.programData.indexOf(line);
+        }
+      });
     },
   },
 };
