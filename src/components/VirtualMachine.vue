@@ -2,7 +2,7 @@
   <div class='main'>
     <div class='menu'>
       <button class='debug'>DEBUG</button>
-      <button class='run' @click="execute()">RUN</button>
+      <button class='run' @click="execute(false)">RUN</button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
     <div class='program'>
@@ -21,7 +21,7 @@
       <p class='title'>Input Area</p>
       <div class="content">
         <input v-model="inputData" />
-        <button @click="addData">Go</button>
+        <button @click="execute(true)">Go</button>
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
         </div>
