@@ -73,6 +73,7 @@ const mixin = {
       if (isInput && this.inputData !== undefined) {
         this.stackData[this.s] = parseInt(this.inputData, 10);
         this.addInputedData();
+        this.isInput = false;
       }
 
       while (loop && this.i < this.programData.length) {
@@ -260,6 +261,7 @@ const mixin = {
 
           case 'RD':
             this.s += 1;
+            this.isInput = true;
             loop = false;
             this.i += 1;
             break;

@@ -24,9 +24,9 @@
       </div>
     </div>
     <div class='input'>
-      <p class='title'>Input Area</p>
-      <div class="content">
-        <input v-model="inputData" />
+      <p v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class='title'>Input Area</p>
+      <div v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class="content">
+        <input v-model="inputData" placeholder="Entre com um valor"/>
         <button @click="execute(true)">Go</button>
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
@@ -79,6 +79,7 @@ export default {
   },
   data() {
     return {
+      isInput: false,
       inputFile: '',
       inputData: '',
       allInputedData: [],
@@ -90,6 +91,14 @@ export default {
         'atributo2',
         'comentario',
       ],
+      inputStyle_1: {
+        background: 'lightGrey',
+        borderColor: 'lightGrey',
+      },
+      inputStyle_2: {
+        background: 'cyan',
+        borderColor: 'cyan',
+      },
     };
   },
   computed: {
