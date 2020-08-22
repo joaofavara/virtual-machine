@@ -1,10 +1,55 @@
+/* eslint-disable max-len */
+// eslint-disable-next-line max-len
+
+// import { forEach } from 'core-js/fn/array';
+
 const mixin = {
   data() {
     return {
       commands: null,
+      i: 0, /* Indice da fila de comandos */
+      s: 0, /* Indice da pilha de dados */
+      programColumns: [
+        'posicao',
+        'instrucao',
+        'atributo1',
+        'atributo2',
+        'comentario',
+      ],
+      programData: [],
+      stackData: [], /* Pilha de dados */
+      stackColumns: [
+        'endereco',
+        'valor',
+      ],
     };
   },
   methods: {
+    parseCommand(command) {
+      const commandSplited = command.split(' ');
+      const instrucao = commandSplited[0].trim() || '';
+      const atributos = commandSplited[1] ? commandSplited[1].trim() : '';
+      const [atributo1, atributo2] = atributos ? atributos.split(',') : ['', ''];
+      return {
+        instrucao,
+        atributo1,
+        atributo2,
+        comentario: '',
+      };
+    },
+    buildProgramData() {
+      let countPosicao = 1;
+      this.commands.forEach((command) => {
+        this.programData.push(
+          {
+            posicao: countPosicao,
+            ...this.parseCommand(command),
+          },
+        );
+
+        countPosicao += 1;
+      });
+    },
     async previewFiles(event) {
       const file = event.target.files[0];
       const reader = new FileReader();
@@ -12,203 +57,252 @@ const mixin = {
 
       reader.onloadend = async () => {
         this.commands = await reader.result.split('\n');
+        this.buildProgramData();
       };
     },
-    execute() {
-      let M; /* Pilha de dados */
-      let i = 0; /* Indice da fila de comandos */
-      let s = 0; /* Indice da pilha de dados */
+    execute(isInput) {
+      let loop = true;
 
-      // if (this.commands.split(' ').length > 2) {
-      //   return -1;
-      // }
+      if (isInput && this.inputData !== undefined) {
+        this.stackData[this.s] = parseInt(this.inputData, 10);
+        this.addInputedData();
+      }
 
-      const operation = this.commands.split(' ')[0];
-      const parameters = this.commands.split(' ')[1];
+      while (loop && this.i < this.programData.length) {
+        console.log(`-- Linha ${this.i + 1} ---`);
+        console.log(`Ponteiro: ${this.s}`);
+        console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
+        console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
+        console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
+        console.log(this.stackData.flat());
+        console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
-      switch (operation) {
-        case 'LDC':
-          s += 1;
-          M[s] = parameters;
-          break;
+        switch (this.programData[this.i].instrucao) {
+          case 'LDC':
+            this.s += 1;
+            this.stackData[this.s] = parseInt(this.programData[this.i].atributo1, 10);
+            this.i += 1;
+            break;
 
-        case 'LDV':
-          s += 1;
-          M[s] = M[parameters];
-          break;
+          case 'LDV':
+            this.s += 1;
+            this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].atributo1, 10)];
+            this.i += 1;
+            break;
 
-        case 'ADD':
-          M[s - 1] = M[s - 1] + M[s];
-          s -= 1;
-          break;
+          case 'ADD':
+            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) + parseInt(this.stackData[this.s], 10);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
 
-        case 'SUB':
-          M[s - 1] = M[s - 1] - M[s];
-          s -= 1;
-          break;
+          case 'SUB':
+            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) - parseInt(this.stackData[this.s], 10);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
 
-        case 'MULT':
-          M[s - 1] = M[s - 1] * M[s];
-          s -= 1;
-          break;
+          case 'MULT':
+            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) * parseInt(this.stackData[this.s], 10);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
 
-        case 'DIVI':
-          M[s - 1] = M[s - 1] / M[s];
-          s -= 1;
-          break;
+          case 'DIVI':
+            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) / parseInt(this.stackData[this.s], 10);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
 
-        case 'INV':
-          M[s] *= (-1);
-          break;
+          case 'INV':
+            this.stackData[this.s] *= (-1);
+            this.i += 1;
+            break;
 
-        case 'AND':
-          if (M[s - 1] === 1 && M[s] === 1) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
+          case 'AND':
+            if (this.stackData[this.s - 1] === 1 && this.stackData[this.s] === 1) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'OR':
+            if (this.stackData[this.s - 1] === 1 || this.stackData[this.s] === 1) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'NEG':
+            this.stackData[this.s] = 1 - this.stackData[this.s];
+            this.i += 1;
+            break;
+
+          case 'CME':
+            if (this.stackData[this.s - 1] < this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'CMA':
+            if (this.stackData[this.s - 1] > this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'CEQ':
+            if (this.stackData[this.s - 1] === this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'CDIF':
+            if (this.stackData[this.s - 1] !== this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'CMEQ':
+            if (this.stackData[this.s - 1] <= this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'CMAQ':
+            if (this.stackData[this.s - 1] >= this.stackData[this.s]) {
+              this.stackData[this.s - 1] = 1;
+            } else {
+              this.stackData[this.s - 1] = 0;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'START':
+            this.s = -1;
+            this.i += 1;
+            break;
+
+          case 'HLT':
+            loop = false;
+            break;
+
+          case 'STR':
+            this.stackData[parseInt(this.programData[this.i].atributo1, 10)] = this.stackData[this.s];
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'JMP': {
+            const label = this.programData[this.i].atributo1;
+            this.jump(label);
+            break;
           }
-          s -= 1;
-          break;
+          case 'JMPF':
+            if (this.stackData[this.s] === 0) {
+              const label = this.programData[this.i].atributo1;
+              this.jump(label);
+            } else {
+              this.i += 1;
+            }
+            this.s -= 1;
+            this.stackData.length -= 1;
+            break;
 
-        case 'OR':
-          if (M[s - 1] === 1 || M[s] === 1) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
+          case 'RD':
+            this.s += 1;
+            loop = false;
+            this.i += 1;
+            break;
+
+          case 'PRN':
+            this.addOutputedData(this.stackData[this.s]);
+            this.s -= 1;
+            this.stackData.length -= 1;
+            this.i += 1;
+            break;
+
+          case 'ALLOC': {
+            const m = parseInt(this.programData[this.i].atributo1, 10);
+            const n = parseInt(this.programData[this.i].atributo2, 10);
+
+            for (let K = 0; K < n; K += 1) {
+              this.s += 1;
+              this.stackData[this.s] = this.stackData[m + K] || 0;
+            }
+            this.i += 1;
+            break;
           }
-          s -= 1;
-          break;
 
-        case 'NEG':
-          M[s] = 1 - M[s];
-          break;
+          case 'DALLOC': {
+            const m = parseInt(this.programData[this.i].atributo1, 10);
+            const n = parseInt(this.programData[this.i].atributo2, 10);
 
-        case 'CME':
-          if (M[s - 1] < M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
+            for (let K = n - 1; K >= 0; K -= 1) {
+              this.stackData[m + K] = this.stackData[this.s];
+              this.s -= 1;
+              this.stackData.length -= 1;
+            }
+            this.i += 1;
+            break;
           }
-          s -= 1;
-          break;
 
-        case 'CMA':
-          if (M[s - 1] > M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
+          case 'CALL': {
+            const label = this.programData[this.i].atributo1;
+            this.s += 1;
+            this.stackData[this.s] = this.i + 1;
+            this.jump(label);
+            break;
           }
-          s -= 1;
-          break;
+          case 'RETURN':
+            this.i = this.stackData[this.s];
+            this.s -= 1;
+            this.stackData.length -= 1;
+            break;
 
-        case 'CEQ':
-          if (M[s - 1] === M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
-          }
-          s -= 1;
-          break;
-
-        case 'CDIF':
-          if (M[s - 1] !== M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
-          }
-          s -= 1;
-          break;
-
-        case 'CMEQ':
-          if (M[s - 1] <= M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
-          }
-          s -= 1;
-          break;
-
-        case 'CMAQ':
-          if (M[s - 1] >= M[s]) {
-            M[s - 1] = 1;
-          } else {
-            M[s - 1] = -1;
-          }
-          s -= 1;
-          break;
-
-        case 'START':
-          s = -1;
-          break;
-
-        case 'HLT':
-          break;
-
-        case 'STR':
-          M[parameters] = M[s];
-          s -= 1;
-          break;
-
-        case 'JMP':
-          i = parameters;
-          break;
-
-        case 'JMPF':
-          if (M[s] === 0) {
-            i = parameters;
-          } else {
-            i += 1;
-          }
-          break;
-
-        case 'NULL':
-          break;
-
-        case 'RD':
-          /* S = S + 1;
-          M[S] = "Entrada do teclado"; */
-          break;
-
-        case 'PRN':
-          /* Imprimir M[S] */
-          console.log(M[s]);
-          s += 1;
-          break;
-
-        case 'ALLOC': {
-          const [m, n] = parameters.split(',');
-
-          for (let K = 0; K < n[1]; K += 1) {
-            s += 1;
-            M[s] = M[m + K];
-          }
-          break;
+          default:
+            this.i += 1;
+            break;
         }
-
-        case 'DALLOC': {
-          const [m, n] = parameters.split(',');
-
-          let K = n - 1;
-          for (K; K >= 0; K -= 1) {
-            M[m + K] = M[s];
-            s -= 1;
-          }
-          break;
-        }
-
-        case 'CALL':
-          s += 1;
-          M[s] = i + 1;
-          i = parameters;
-          break;
-
-        case 'RETURN':
-          i = M[s];
-          s -= 1;
-          break;
-
-        default:
-          break;
       }
     },
   },

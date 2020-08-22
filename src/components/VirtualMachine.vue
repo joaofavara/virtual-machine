@@ -2,27 +2,26 @@
   <div class='main'>
     <div class='menu'>
       <button class='debug'>DEBUG</button>
-      <button class='run'>RUN</button>
+      <button class='run' @click="execute(false)">RUN</button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
-
     <div class='program'>
       <p class='title'>Program Stack</p>
       <div class="content">
-        <Table :data='gridData' :columns='programColumns' />
+        <Table :data='programData' :columns='programColumns' />
       </div>
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
       <div class="content">
-        <Table :data='gridData' :columns='dataColumns' />
+        <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
     <div class='input'>
       <p class='title'>Input Area</p>
       <div class="content">
         <input v-model="inputData" />
-        <button @click="addData">Go</button>
+        <button @click="execute(true)">Go</button>
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
         </div>
@@ -32,7 +31,7 @@
       <p class='title'>Output Area</p>
       <div class="content">
         <div class="show-data">
-          <!-- Put the output data -->
+          <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
         </div>
       </div>
     </div>
@@ -41,6 +40,7 @@
 
 <script>
 import Table from './Table.vue';
+import TableStack from './TableStack.vue';
 import Mixin from '../mixin/mixin';
 
 export default {
@@ -48,32 +48,37 @@ export default {
   mixins: [Mixin],
   components: {
     Table,
+    TableStack,
   },
   data() {
     return {
       inputFile: '',
       inputData: '',
       allInputedData: [],
+      allOutputedData: [],
       programColumns: [
-        'Posição',
-        'Instrução',
-        'Atributo #1',
-        'Atributo #2',
-        'Comentário',
-      ],
-      dataColumns: ['Endereço (S)', 'Valor'],
-      gridData: [
-        { name: 'Chuck Norris', power: Infinity },
-        { name: 'Bruce Lee', power: 9000 },
-        { name: 'Jackie Chan', power: 7000 },
-        { name: 'Jet Li', power: 8000 },
+        'posicao',
+        'instrucao',
+        'atributo1',
+        'atributo2',
+        'comentario',
       ],
     };
   },
   methods: {
-    addData() {
+    addInputedData() {
       this.allInputedData.push(this.inputData);
       this.inputData = '';
+    },
+    addOutputedData(data) {
+      this.allOutputedData.push(data);
+    },
+    jump(label) {
+      this.programData.forEach((line) => {
+        if (label === line.instrucao) {
+          this.i = this.programData.indexOf(line);
+        }
+      });
     },
   },
 };
@@ -102,6 +107,10 @@ body {
 
     .program {
       grid-area: program;
+      .content {
+        height: 220px;
+        overflow: auto;
+      }
     }
 
     .input {
@@ -169,8 +178,7 @@ body {
     }
 
     .content {
-      background-color: $gray;
-      padding: 10px;
+      border: $gray solid 10px;
     }
   }
 }
