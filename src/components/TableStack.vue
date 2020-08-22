@@ -2,12 +2,13 @@
   <table>
     <thead>
       <tr>
-        <th v-for="key in columns" :key="key" @click="sortBy(key)">{{ key }}</th>
+        <th v-for="(key, index) in columns" :key="index" @click="sortBy(key)">{{ key }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="entry in data" :key="entry">
-        <td v-for="key in columns" :key="key">{{ entry[key] }}</td>
+      <tr v-for="(entry, index) in data" :key="index">
+        <td>{{ index + 1 }}</td>
+        <td>{{ entry }}</td>
       </tr>
     </tbody>
   </table>
