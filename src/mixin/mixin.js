@@ -6,6 +6,7 @@
 const mixin = {
   data() {
     return {
+      isSelectedRow: [],
       commands: null,
       i: 0, /* Indice da fila de comandos */
       s: 0, /* Indice da pilha de dados */
@@ -25,6 +26,10 @@ const mixin = {
     };
   },
   methods: {
+    selectedRow(commands) {
+      this.isSelectedRow = commands.map(() => false);
+      console.log('this.isSelectedRow: ', this.isSelectedRow);
+    },
     parseCommand(command) {
       const commandSplited = command.split(' ');
       const instrucao = commandSplited[0].trim() || '';
@@ -57,6 +62,7 @@ const mixin = {
 
       reader.onloadend = async () => {
         this.commands = await reader.result.split('\n');
+        this.selectedRow(this.commands);
         this.buildProgramData();
       };
     },

@@ -8,7 +8,9 @@
     <div class='program'>
       <p class='title'>Program Stack</p>
       <div class="content">
-        <Table :data='programData' :columns='programColumns' />
+        <Table :data='programData' :columns='programColumns' :isSelectedRow='isSelectedRow'
+          @selected-row='changeToSelectedRow'
+        />
       </div>
     </div>
     <div class='data'>
@@ -79,6 +81,10 @@ export default {
           this.i = this.programData.indexOf(line);
         }
       });
+    },
+    changeToSelectedRow(index) {
+      console.log('index: ', index);
+      this.isSelectedRow[index] = !this.isSelectedRow[index];
     },
   },
 };
