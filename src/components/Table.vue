@@ -31,6 +31,7 @@ export default {
 
 <style lang="scss">
 $green: #EAF2F8;
+$red: #FFE4E1;
 
 table {
   border-radius: 3px;
@@ -54,7 +55,7 @@ table {
       background-color: white;
 
       &.selected {
-        background-color: red;
+        background-color: $red;
       }
     }
   }
