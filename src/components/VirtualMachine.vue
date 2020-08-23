@@ -37,6 +37,27 @@
         </div>
       </div>
     </div>
+    <div class='debbug'>
+      <p class='title'>
+        Break Points
+        <button>
+          <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
+        </button>
+        <button>
+          <img type="image/svg+xml" src="../assets/redo-24px.svg" />
+        </button>
+        <button>
+          <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
+        </button>
+      </p>
+      <div class="content">
+        <div class="show-data">
+          <span v-for="(data, index) in breakpoints" :key="index">
+            {{ data }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,6 +87,11 @@ export default {
         'comentario',
       ],
     };
+  },
+  computed: {
+    breakpoints() {
+      return this.isSelectedRow.map((row, index) => (row ? this.programData[index].posicao : null));
+    },
   },
   methods: {
     addInputedData() {
@@ -106,10 +132,10 @@ body {
     grid-gap: 20px;
     grid-template-rows: auto 1fr 1fr 1fr;
     grid-template-areas:
-      'menu       .           .'
-      'program    program     data'
-      'program    program     data'
-      'input      output      data';
+      'menu       .         .        .'
+      'program    program   program        data'
+      'program    program   program        data'
+      'input      output    debbug   data';
 
     .program {
       grid-area: program;
@@ -175,6 +201,20 @@ body {
       }
     }
 
+    .debbug {
+      grid-area: debbug;
+
+      .show-data {
+        margin-top: 10px;
+        background: white;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 125px;
+        overflow: auto;
+      }
+    }
+
     .title {
       background-color: $gray;
       border-radius: 8px 8px 0 0;
@@ -185,7 +225,19 @@ body {
 
     .content {
       border: $gray solid 10px;
+      border-radius: 0 8px 8px 8px;
     }
   }
+
+  // @media (max-width: 600px) {
+  //   .main {
+  //    grid-template-areas:
+  //     'menu       .'
+  //     'program    program'
+  //     'program    program'
+  //     'input      output'
+  //     'debbug     data';
+  //   }
+  // }
 }
 </style>
