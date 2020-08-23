@@ -2,7 +2,7 @@ START
 ALLOC 0,2
 JMP L1
 L2 NULL
-ALLOC 2,1
+ALLOC 2,1 # comentario
 LDV 0
 STR 2
 LDV 0
