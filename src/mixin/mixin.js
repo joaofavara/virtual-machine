@@ -7,6 +7,7 @@ const mixin = {
   data() {
     return {
       isSelectedRow: [],
+      executionRow: [],
       commands: null,
       i: 0, /* Indice da fila de comandos */
       s: 0, /* Indice da pilha de dados */
@@ -26,9 +27,9 @@ const mixin = {
     };
   },
   methods: {
-    selectedRow(commands) {
+    setUpDefaultArray(commands) {
       this.isSelectedRow = commands.map(() => false);
-      console.log('this.isSelectedRow: ', this.isSelectedRow);
+      this.executionRow = commands.map(() => false);
     },
     parseCommand(command) {
       const commandSplited = command.split(' ');
@@ -62,7 +63,7 @@ const mixin = {
 
       reader.onloadend = async () => {
         this.commands = await reader.result.split('\n');
-        this.selectedRow(this.commands);
+        this.setUpDefaultArray(this.commands);
         this.buildProgramData();
       };
     },
@@ -80,8 +81,11 @@ const mixin = {
         console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
         console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
         console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
+        console.log(`executionRow: ${this.executionRow[this.i]}`);
         console.log(this.stackData.flat());
         console.log(`-- Linha ${this.i + 1} ---\n\n`);
+
+        this.executionRow[this.i] = true;
 
         switch (this.programData[this.i].instrucao) {
           case 'LDC':

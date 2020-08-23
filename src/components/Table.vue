@@ -8,7 +8,10 @@
     <tbody>
       <tr v-for="(entry, index) in data" :key="index" @click="selectRow(index)">
         <td v-for="(column, indexColumn) in columns"
-        :key="indexColumn" :class="{ selected: isSelectedRow[index] }">{{ entry[column] }}</td>
+        :key="indexColumn"
+        :class="{ selected: isSelectedRow[index], running: executionRow[index] }">
+          {{ entry[column] }}
+        </td>
       </tr>
     </tbody>
   </table>
@@ -20,6 +23,7 @@ export default {
     data: Array,
     columns: Array,
     isSelectedRow: Array,
+    executionRow: Array,
   },
   methods: {
     selectRow(index) {
@@ -32,6 +36,7 @@ export default {
 <style lang="scss">
 $green: #EAF2F8;
 $red: #FFE4E1;
+$blue: #E0FFFF;
 
 table {
   border-radius: 3px;
@@ -55,6 +60,14 @@ table {
       background-color: white;
 
       &.selected {
+        background-color: $red;
+      }
+
+      &.running {
+        background-color: $blue;
+      }
+
+      &.selected.running:first-child {
         background-color: $red;
       }
     }
