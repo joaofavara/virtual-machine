@@ -8,7 +8,11 @@
     <div class='program'>
       <p class='title'>Program Stack</p>
       <div class="content">
-        <Table :data='programData' :columns='programColumns' :isSelectedRow='isSelectedRow'
+        <Table
+          :data='programData'
+          :columns='programColumns'
+          :isSelectedRow='isSelectedRow'
+          :executionRow='executionRow'
           @selected-row='changeToSelectedRow'
         />
       </div>
