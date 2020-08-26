@@ -6,6 +6,7 @@
 const mixin = {
   data() {
     return {
+      loop: true,
       isSelectedRow: [],
       executionRow: [],
       commands: null,
@@ -36,11 +37,13 @@ const mixin = {
       const instrucao = commandSplited[0].trim() || '';
       const atributos = commandSplited[1] ? commandSplited[1].trim() : '';
       const [atributo1, atributo2] = atributos ? atributos.split(',') : ['', ''];
+      const breakpoint = false;
       return {
         instrucao,
         atributo1,
         atributo2,
         comentario: '',
+        breakpoint,
       };
     },
     buildProgramData() {
@@ -68,14 +71,15 @@ const mixin = {
       };
     },
     execute(isInput) {
-      let loop = true;
+      this.loop = true;
 
-      if (isInput && this.inputData !== undefined) {
+      if (isInput && this.inputData) {
         this.stackData[this.s] = parseInt(this.inputData, 10);
         this.addInputedData();
+        this.isInput = false;
       }
 
-      while (loop && this.i < this.programData.length) {
+      while (this.loop && this.i < this.programData.length) {
         console.log(`-- Linha ${this.i + 1} ---`);
         console.log(`Ponteiro: ${this.s}`);
         console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
@@ -86,232 +90,10 @@ const mixin = {
         console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
         this.executionRow[this.i] = true;
-
-        switch (this.programData[this.i].instrucao) {
-          case 'LDC':
-            this.s += 1;
-            this.stackData[this.s] = parseInt(this.programData[this.i].atributo1, 10);
-            this.i += 1;
-            break;
-
-          case 'LDV':
-            this.s += 1;
-            this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].atributo1, 10)];
-            this.i += 1;
-            break;
-
-          case 'ADD':
-            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) + parseInt(this.stackData[this.s], 10);
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'SUB':
-            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) - parseInt(this.stackData[this.s], 10);
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'MULT':
-            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) * parseInt(this.stackData[this.s], 10);
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'DIVI':
-            this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) / parseInt(this.stackData[this.s], 10);
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'INV':
-            this.stackData[this.s] *= (-1);
-            this.i += 1;
-            break;
-
-          case 'AND':
-            if (this.stackData[this.s - 1] === 1 && this.stackData[this.s] === 1) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'OR':
-            if (this.stackData[this.s - 1] === 1 || this.stackData[this.s] === 1) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'NEG':
-            this.stackData[this.s] = 1 - this.stackData[this.s];
-            this.i += 1;
-            break;
-
-          case 'CME':
-            if (this.stackData[this.s - 1] < this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'CMA':
-            if (this.stackData[this.s - 1] > this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'CEQ':
-            if (this.stackData[this.s - 1] === this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'CDIF':
-            if (this.stackData[this.s - 1] !== this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'CMEQ':
-            if (this.stackData[this.s - 1] <= this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'CMAQ':
-            if (this.stackData[this.s - 1] >= this.stackData[this.s]) {
-              this.stackData[this.s - 1] = 1;
-            } else {
-              this.stackData[this.s - 1] = 0;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'START':
-            this.s = -1;
-            this.i += 1;
-            break;
-
-          case 'HLT':
-            loop = false;
-            break;
-
-          case 'STR':
-            this.stackData[parseInt(this.programData[this.i].atributo1, 10)] = this.stackData[this.s];
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'JMP': {
-            const label = this.programData[this.i].atributo1;
-            this.jump(label);
-            break;
-          }
-          case 'JMPF':
-            if (this.stackData[this.s] === 0) {
-              const label = this.programData[this.i].atributo1;
-              this.jump(label);
-            } else {
-              this.i += 1;
-            }
-            this.s -= 1;
-            this.stackData.length -= 1;
-            break;
-
-          case 'RD':
-            this.s += 1;
-            loop = false;
-            this.i += 1;
-            break;
-
-          case 'PRN':
-            this.addOutputedData(this.stackData[this.s]);
-            this.s -= 1;
-            this.stackData.length -= 1;
-            this.i += 1;
-            break;
-
-          case 'ALLOC': {
-            const m = parseInt(this.programData[this.i].atributo1, 10);
-            const n = parseInt(this.programData[this.i].atributo2, 10);
-
-            for (let K = 0; K < n; K += 1) {
-              this.s += 1;
-              this.stackData[this.s] = this.stackData[m + K] || 0;
-            }
-            this.i += 1;
-            break;
-          }
-
-          case 'DALLOC': {
-            const m = parseInt(this.programData[this.i].atributo1, 10);
-            const n = parseInt(this.programData[this.i].atributo2, 10);
-
-            for (let K = n - 1; K >= 0; K -= 1) {
-              this.stackData[m + K] = this.stackData[this.s];
-              this.s -= 1;
-              this.stackData.length -= 1;
-            }
-            this.i += 1;
-            break;
-          }
-
-          case 'CALL': {
-            const label = this.programData[this.i].atributo1;
-            this.s += 1;
-            this.stackData[this.s] = this.i + 1;
-            this.jump(label);
-            break;
-          }
-          case 'RETURN':
-            this.i = this.stackData[this.s];
-            this.s -= 1;
-            this.stackData.length -= 1;
-            break;
-
-          default:
-            this.i += 1;
-            break;
+        this.executeLine();
+        console.log(this.executeData.state);
+        if (this.executeData.state === 'DEBUG' && this.programData[this.i].breakpoint) {
+          break;
         }
       }
     },

@@ -1,8 +1,8 @@
 <template>
   <div class='main'>
     <div class='menu'>
-      <button class='debug'>DEBUG</button>
-      <button class='run' @click="execute(false)">RUN</button>
+      <button class='debug' @click="setupExecutionData('DEBUG')">DEBUG</button>
+      <button class='run' @click="setupExecutionData('RUN')">RUN</button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
     <div class='program'>
@@ -24,9 +24,9 @@
       </div>
     </div>
     <div class='input'>
-      <p class='title'>Input Area</p>
-      <div class="content">
-        <input v-model="inputData" />
+      <p v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class='title'>Input Area</p>
+      <div v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class="content">
+        <input v-model="inputData" placeholder="Entre com um valor"/>
         <button @click="execute(true)">Go</button>
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
@@ -44,13 +44,13 @@
     <div class='debbug'>
       <p class='title'>
         Break Points
-        <button>
+        <button @click="setupExecutionData('DEBUG')">
           <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
         </button>
-        <button>
+        <button @click="executeLine()">
           <img type="image/svg+xml" src="../assets/redo-24px.svg" />
         </button>
-        <button>
+        <button @click="setupExecutionData('RUN')">
           <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
         </button>
       </p>
@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
 </template>
 
 <script>
@@ -79,6 +79,7 @@ export default {
   },
   data() {
     return {
+      isInput: false,
       inputFile: '',
       inputData: '',
       allInputedData: [],
@@ -90,6 +91,18 @@ export default {
         'atributo2',
         'comentario',
       ],
+      inputStyle_1: {
+        background: 'lightGrey',
+        borderColor: 'lightGrey',
+      },
+      inputStyle_2: {
+        background: 'cyan',
+        borderColor: 'cyan',
+      },
+      executeData: {
+        state: '',
+        nextLine: false,
+      },
     };
   },
   computed: {
@@ -105,7 +118,7 @@ export default {
     addOutputedData(data) {
       this.allOutputedData.push(data);
     },
-    jump(label) {
+    jumpTo(label) {
       this.programData.forEach((line) => {
         if (label === line.instrucao) {
           this.i = this.programData.indexOf(line);
@@ -115,6 +128,246 @@ export default {
     changeToSelectedRow(index) {
       console.log('index: ', index);
       this.isSelectedRow[index] = !this.isSelectedRow[index];
+      this.programData[index].breakpoint = !this.programData[index].breakpoint;
+    },
+    setupExecutionData(typeExecution) {
+      this.executeData.state = typeExecution;
+
+      this.execute(false);
+    },
+    executeLine() {
+      this.executionRow[this.i] = true;
+      switch (this.programData[this.i].instrucao) {
+        case 'LDC':
+          this.s += 1;
+          this.stackData[this.s] = parseInt(this.programData[this.i].atributo1, 10);
+          this.i += 1;
+          break;
+
+        case 'LDV':
+          this.s += 1;
+          this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].atributo1, 10)];
+          this.i += 1;
+          break;
+
+        case 'ADD':
+          // eslint-disable-next-line max-len
+          this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) + parseInt(this.stackData[this.s], 10);
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'SUB':
+          // eslint-disable-next-line max-len
+          this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) - parseInt(this.stackData[this.s], 10);
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'MULT':
+          // eslint-disable-next-line max-len
+          this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) * parseInt(this.stackData[this.s], 10);
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'DIVI':
+          // eslint-disable-next-line max-len
+          this.stackData[this.s - 1] = parseInt(this.stackData[this.s - 1], 10) / parseInt(this.stackData[this.s], 10);
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'INV':
+          this.stackData[this.s] *= (-1);
+          this.i += 1;
+          break;
+
+        case 'AND':
+          if (this.stackData[this.s - 1] === 1 && this.stackData[this.s] === 1) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'OR':
+          if (this.stackData[this.s - 1] === 1 || this.stackData[this.s] === 1) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'NEG':
+          this.stackData[this.s] = 1 - this.stackData[this.s];
+          this.i += 1;
+          break;
+
+        case 'CME':
+          if (this.stackData[this.s - 1] < this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'CMA':
+          if (this.stackData[this.s - 1] > this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'CEQ':
+          if (this.stackData[this.s - 1] === this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'CDIF':
+          if (this.stackData[this.s - 1] !== this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'CMEQ':
+          if (this.stackData[this.s - 1] <= this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'CMAQ':
+          if (this.stackData[this.s - 1] >= this.stackData[this.s]) {
+            this.stackData[this.s - 1] = 1;
+          } else {
+            this.stackData[this.s - 1] = 0;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'START':
+          this.s = -1;
+          this.i += 1;
+          break;
+
+        case 'HLT':
+          this.loop = false;
+          break;
+
+        case 'STR':
+          this.stackData[parseInt(this.programData[this.i].atributo1, 10)] = this.stackData[this.s];
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'JMP': {
+          const label = this.programData[this.i].atributo1;
+          this.jumpTo(label);
+          break;
+        }
+        case 'JMPF':
+          if (this.stackData[this.s] === 0) {
+            const label = this.programData[this.i].atributo1;
+            this.jumpTo(label);
+          } else {
+            this.i += 1;
+          }
+          this.s -= 1;
+          this.stackData.length -= 1;
+          break;
+
+        case 'RD':
+          this.s += 1;
+          this.isInput = true;
+          this.loop = false;
+          this.i += 1;
+          break;
+
+        case 'PRN':
+          this.addOutputedData(this.stackData[this.s]);
+          this.s -= 1;
+          this.stackData.length -= 1;
+          this.i += 1;
+          break;
+
+        case 'ALLOC': {
+          const m = parseInt(this.programData[this.i].atributo1, 10);
+          const n = parseInt(this.programData[this.i].atributo2, 10);
+
+          for (let K = 0; K < n; K += 1) {
+            this.s += 1;
+            this.stackData[this.s] = this.stackData[m + K] || 0;
+          }
+          this.i += 1;
+          break;
+        }
+
+        case 'DALLOC': {
+          const m = parseInt(this.programData[this.i].atributo1, 10);
+          const n = parseInt(this.programData[this.i].atributo2, 10);
+
+          for (let K = n - 1; K >= 0; K -= 1) {
+            this.stackData[m + K] = this.stackData[this.s];
+            this.s -= 1;
+            this.stackData.length -= 1;
+          }
+          this.i += 1;
+          break;
+        }
+
+        case 'CALL': {
+          const label = this.programData[this.i].atributo1;
+          this.s += 1;
+          this.stackData[this.s] = this.i + 1;
+          this.jumpTo(label);
+          break;
+        }
+        case 'RETURN':
+          this.i = this.stackData[this.s];
+          this.s -= 1;
+          this.stackData.length -= 1;
+          break;
+
+        default:
+          this.i += 1;
+          break;
+      }
     },
   },
 };
@@ -165,6 +418,10 @@ body {
 
     .data {
       grid-area: data;
+      .content {
+        height: 490px;
+        overflow: auto;
+      }
     }
 
     .output {
