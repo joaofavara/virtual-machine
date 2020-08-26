@@ -89,7 +89,6 @@ const mixin = {
         console.log(this.stackData.flat());
         console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
-        this.executionRow[this.i] = true;
         this.executeLine();
         console.log(this.executeData.state);
         if (this.executeData.state === 'DEBUG' && this.programData[this.i].breakpoint) {
