@@ -33,16 +33,18 @@ const mixin = {
       this.executionRow = commands.map(() => false);
     },
     parseCommand(command) {
-      const commandSplited = command.split(' ');
-      const Instrucao = commandSplited[0].trim() || '';
-      const atributos = commandSplited[1] ? commandSplited[1].trim() : '';
-      const [Atributo1, Atributo2] = atributos ? atributos.split(',') : ['', ''];
+      const commandSplited = command.split('#');
+      const commandPart = commandSplited[0].split(' ') || '';
+      const comentario = commandSplited[1] || '';
+      const instrucao = commandPart[0].trim() || '';
+      const atributos = commandPart[1] ? commandPart[1].trim() : '';
+      const [atributo1, atributo2] = atributos ? atributos.split(',') : ['', ''];
       const breakpoint = false;
       return {
-        Instrucao,
-        Atributo1,
-        Atributo2,
-        Comentario: '',
+        instrucao,
+        atributo1,
+        atributo2,
+        comentario,
         breakpoint,
       };
     },
