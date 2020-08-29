@@ -2,8 +2,12 @@
 <template>
   <div class='main'>
     <div class='menu'>
-      <button class='debug' @click="setupExecutionData('DEBUG')">DEBUG</button>
-      <button class='run' @click="setupExecutionData('RUN')">RUN</button>
+      <button class='debug' @click="setupExecutionData('DEBUG')" :disabled="isDisabled">
+        DEBUG
+      </button>
+      <button class='run' @click="setupExecutionData('RUN')" :disabled="isDisabled">
+        RUN
+      </button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
     <div class='program'>
@@ -28,7 +32,7 @@
       <p :class="{ isInput: isInput }" class='title'>
         Input Area
         <input v-model="inputData" placeholder="Entre com um valor"/>
-        <button @click="execute(true)">Go</button>
+        <button @click="execute(true)" :disabled="!isInput">Go</button>
       </p>
       <div :class="{ isInput: isInput }" class="content">
         <div class="show-data">
@@ -47,13 +51,13 @@
     <div class='debbug'>
       <p class='title'>
         Break Points
-        <button @click="setupExecutionData('DEBUG')">
+        <button @click="setupExecutionData('DEBUG')" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
         </button>
-        <button @click="executeLine()">
+        <button @click="executeLine()" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/redo-24px.svg" />
         </button>
-        <button @click="setupExecutionData('RUN')">
+        <button @click="setupExecutionData('RUN')" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
         </button>
       </p>
@@ -65,7 +69,7 @@
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -104,6 +108,12 @@ export default {
   computed: {
     breakpoints() {
       return this.isSelectedRow.map((row, index) => (row ? this.programData[index].Posicao : null));
+    },
+    isDebuging() {
+      return this.executeData.state === 'DEBUG';
+    },
+    isDisabled() {
+      return this.executeData.state !== '';
     },
   },
   methods: {
