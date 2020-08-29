@@ -8,7 +8,7 @@
     </div>
     <div class='program'>
       <p class='title'>Program Stack</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <Table
           :data='programData'
           :columns='programColumns'
@@ -20,17 +20,17 @@
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
     <div class='input'>
-      <!-- eslint-disable-next-line max-len -->
-      <p v-bind:style="[ isInput ? { background: 'cyan' } : { background: 'lightGrey' } ]" class='title'>Input Area</p>
-      <!-- eslint-disable-next-line max-len -->
-      <div v-bind:style="[ isInput ? { background: 'cyan', borderColor: 'cyan'} : { background: 'lightGrey', borderColor: 'lightGrey', } ]" class="content">
+      <p :class="{ isInput: isInput }" class='title'>
+        Input Area
         <input v-model="inputData" placeholder="Entre com um valor"/>
         <button @click="execute(true)">Go</button>
+      </p>
+      <div :class="{ isInput: isInput }" class="content">
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
         </div>
@@ -38,7 +38,7 @@
     </div>
     <div class='output'>
       <p class='title'>Output Area</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <div class="show-data">
           <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
         </div>
@@ -57,7 +57,7 @@
           <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
         </button>
       </p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <div class="show-data">
           <span v-for="(data, index) in breakpoints" :key="index">
             {{ data }}
@@ -394,6 +394,20 @@ body {
       'program    program   program        data'
       'input      output    debbug   data';
 
+    .title {
+      background-color: $gray;
+      border-radius: 8px 8px 0 0;
+      width: fit-content;
+      padding: 8px;
+      margin: 0;
+    }
+
+    .content {
+      border: $gray solid 10px;
+      border-radius: 0 8px 8px 8px;
+      background-color: white;
+    }
+
     .program {
       grid-area: program;
       .content {
@@ -404,6 +418,11 @@ body {
 
     .input {
       grid-area: input;
+
+      .isInput {
+        background: cyan;
+        border-color: cyan;
+      }
 
       .show-data {
         margin-top: 10px;
@@ -428,7 +447,6 @@ body {
       grid-area: output;
 
       .show-data {
-        margin-top: 10px;
         background: white;
         width: 100%;
         display: flex;
@@ -466,7 +484,6 @@ body {
       grid-area: debbug;
 
       .show-data {
-        margin-top: 10px;
         background: white;
         width: 100%;
         display: flex;
@@ -475,30 +492,6 @@ body {
         overflow: auto;
       }
     }
-
-    .title {
-      background-color: $gray;
-      border-radius: 8px 8px 0 0;
-      width: fit-content;
-      padding: 8px;
-      margin: 0;
-    }
-
-    .content {
-      border: $gray solid 10px;
-      border-radius: 0 8px 8px 8px;
-    }
   }
-
-  // @media (max-width: 600px) {
-  //   .main {
-  //    grid-template-areas:
-  //     'menu       .'
-  //     'program    program'
-  //     'program    program'
-  //     'input      output'
-  //     'debbug     data';
-  //   }
-  // }
 }
 </style>
