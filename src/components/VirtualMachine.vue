@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 <template>
   <div class='main'>
     <div class='menu'>
@@ -7,7 +8,7 @@
     </div>
     <div class='program'>
       <p class='title'>Program Stack</p>
-      <div class="content">
+      <div v-bind:style="{background:'white'}" class="content">
         <Table
           :data='programData'
           :columns='programColumns'
@@ -19,13 +20,15 @@
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
-      <div class="content">
+      <div v-bind:style="{background:'white'}" class="content">
         <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
     <div class='input'>
-      <p v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class='title'>Input Area</p>
-      <div v-bind:style="[ isInput ? inputStyle_2 : inputStyle_1 ]" class="content">
+      <!-- eslint-disable-next-line max-len -->
+      <p v-bind:style="[ isInput ? { background: 'cyan' } : { background: 'lightGrey' } ]" class='title'>Input Area</p>
+      <!-- eslint-disable-next-line max-len -->
+      <div v-bind:style="[ isInput ? { background: 'cyan', borderColor: 'cyan'} : { background: 'lightGrey', borderColor: 'lightGrey', } ]" class="content">
         <input v-model="inputData" placeholder="Entre com um valor"/>
         <button @click="execute(true)">Go</button>
         <div class="show-data">
@@ -35,7 +38,7 @@
     </div>
     <div class='output'>
       <p class='title'>Output Area</p>
-      <div class="content">
+      <div v-bind:style="{background:'white'}" class="content">
         <div class="show-data">
           <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
         </div>
@@ -54,7 +57,7 @@
           <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
         </button>
       </p>
-      <div class="content">
+      <div v-bind:style="{background:'white'}" class="content">
         <div class="show-data">
           <span v-for="(data, index) in breakpoints" :key="index">
             {{ data }}
@@ -79,26 +82,19 @@ export default {
   },
   data() {
     return {
+      lastRow: -1,
       isInput: false,
       inputFile: '',
       inputData: '',
       allInputedData: [],
       allOutputedData: [],
       programColumns: [
-        'posicao',
-        'instrucao',
-        'atributo1',
-        'atributo2',
-        'comentario',
+        'Posicao',
+        'Instrucao',
+        'Atributo1',
+        'Atributo2',
+        'Comentario',
       ],
-      inputStyle_1: {
-        background: 'lightGrey',
-        borderColor: 'lightGrey',
-      },
-      inputStyle_2: {
-        background: 'cyan',
-        borderColor: 'cyan',
-      },
       executeData: {
         state: '',
         nextLine: false,
@@ -107,7 +103,7 @@ export default {
   },
   computed: {
     breakpoints() {
-      return this.isSelectedRow.map((row, index) => (row ? this.programData[index].posicao : null));
+      return this.isSelectedRow.map((row, index) => (row ? this.programData[index].Posicao : null));
     },
   },
   methods: {
@@ -120,7 +116,7 @@ export default {
     },
     jumpTo(label) {
       this.programData.forEach((line) => {
-        if (label === line.instrucao) {
+        if (label === line.Instrucao) {
           this.i = this.programData.indexOf(line);
         }
       });
@@ -136,17 +132,21 @@ export default {
       this.execute(false);
     },
     executeLine() {
+      if (this.i !== this.lastRow) {
+        this.executionRow[this.lastRow] = false;
+        this.lastRow = this.i;
+      }
       this.executionRow[this.i] = true;
-      switch (this.programData[this.i].instrucao) {
+      switch (this.programData[this.i].Instrucao) {
         case 'LDC':
           this.s += 1;
-          this.stackData[this.s] = parseInt(this.programData[this.i].atributo1, 10);
+          this.stackData[this.s] = parseInt(this.programData[this.i].Atributo1, 10);
           this.i += 1;
           break;
 
         case 'LDV':
           this.s += 1;
-          this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].atributo1, 10)];
+          this.stackData[this.s] = this.stackData[parseInt(this.programData[this.i].Atributo1, 10)];
           this.i += 1;
           break;
 
@@ -290,20 +290,20 @@ export default {
           break;
 
         case 'STR':
-          this.stackData[parseInt(this.programData[this.i].atributo1, 10)] = this.stackData[this.s];
+          this.stackData[parseInt(this.programData[this.i].Atributo1, 10)] = this.stackData[this.s];
           this.s -= 1;
           this.stackData.length -= 1;
           this.i += 1;
           break;
 
         case 'JMP': {
-          const label = this.programData[this.i].atributo1;
+          const label = this.programData[this.i].Atributo1;
           this.jumpTo(label);
           break;
         }
         case 'JMPF':
           if (this.stackData[this.s] === 0) {
-            const label = this.programData[this.i].atributo1;
+            const label = this.programData[this.i].Atributo1;
             this.jumpTo(label);
           } else {
             this.i += 1;
@@ -327,8 +327,8 @@ export default {
           break;
 
         case 'ALLOC': {
-          const m = parseInt(this.programData[this.i].atributo1, 10);
-          const n = parseInt(this.programData[this.i].atributo2, 10);
+          const m = parseInt(this.programData[this.i].Atributo1, 10);
+          const n = parseInt(this.programData[this.i].Atributo2, 10);
 
           for (let K = 0; K < n; K += 1) {
             this.s += 1;
@@ -339,8 +339,8 @@ export default {
         }
 
         case 'DALLOC': {
-          const m = parseInt(this.programData[this.i].atributo1, 10);
-          const n = parseInt(this.programData[this.i].atributo2, 10);
+          const m = parseInt(this.programData[this.i].Atributo1, 10);
+          const n = parseInt(this.programData[this.i].Atributo2, 10);
 
           for (let K = n - 1; K >= 0; K -= 1) {
             this.stackData[m + K] = this.stackData[this.s];
@@ -352,7 +352,7 @@ export default {
         }
 
         case 'CALL': {
-          const label = this.programData[this.i].atributo1;
+          const label = this.programData[this.i].Atributo1;
           this.s += 1;
           this.stackData[this.s] = this.i + 1;
           this.jumpTo(label);
