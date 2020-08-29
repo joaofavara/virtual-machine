@@ -7,7 +7,7 @@
     </thead>
     <tbody>
       <tr v-for="(entry, index) in data" :key="index">
-        <td>{{ index + 1 }}</td>
+        <td>{{ index }}</td>
         <td>{{ entry }}</td>
       </tr>
     </tbody>

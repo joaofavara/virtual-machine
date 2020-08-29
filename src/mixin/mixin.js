@@ -13,17 +13,17 @@ const mixin = {
       i: 0, /* Indice da fila de comandos */
       s: 0, /* Indice da pilha de dados */
       programColumns: [
-        'posicao',
-        'instrucao',
-        'atributo1',
-        'atributo2',
-        'comentario',
+        'Posicao',
+        'Instrucao',
+        'Atributo1',
+        'Atributo2',
+        'Comentario',
       ],
       programData: [],
       stackData: [], /* Pilha de dados */
       stackColumns: [
-        'endereco',
-        'valor',
+        'Endereco',
+        'Valor',
       ],
     };
   },
@@ -34,15 +34,15 @@ const mixin = {
     },
     parseCommand(command) {
       const commandSplited = command.split(' ');
-      const instrucao = commandSplited[0].trim() || '';
+      const Instrucao = commandSplited[0].trim() || '';
       const atributos = commandSplited[1] ? commandSplited[1].trim() : '';
-      const [atributo1, atributo2] = atributos ? atributos.split(',') : ['', ''];
+      const [Atributo1, Atributo2] = atributos ? atributos.split(',') : ['', ''];
       const breakpoint = false;
       return {
-        instrucao,
-        atributo1,
-        atributo2,
-        comentario: '',
+        Instrucao,
+        Atributo1,
+        Atributo2,
+        Comentario: '',
         breakpoint,
       };
     },
@@ -51,7 +51,7 @@ const mixin = {
       this.commands.forEach((command) => {
         this.programData.push(
           {
-            posicao: countPosicao,
+            Posicao: countPosicao,
             ...this.parseCommand(command),
           },
         );
@@ -82,16 +82,15 @@ const mixin = {
       while (this.loop && this.i < this.programData.length) {
         console.log(`-- Linha ${this.i + 1} ---`);
         console.log(`Ponteiro: ${this.s}`);
-        console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
-        console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
-        console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
+        console.log(`Instrucao: ${this.programData[this.i].Instrucao}`);
+        console.log(`Atributo1: ${this.programData[this.i].Atributo1}`);
+        console.log(`Atributo2: ${this.programData[this.i].Atributo2}`);
         console.log(`executionRow: ${this.executionRow[this.i]}`);
         console.log(this.stackData.flat());
         console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
         this.executeLine();
-        console.log(this.executeData.state);
-        if (this.executeData.state === 'DEBUG' && this.programData[this.i].breakpoint) {
+        if (this.executeData.state === 'DEBUG' && !this.isInput && this.programData[this.lastRow].breakpoint) {
           break;
         }
       }
