@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table class="stack">
     <thead>
       <tr>
         <th v-for="(key, index) in columns" :key="index" @click="sortBy(key)">{{ key }}</th>
@@ -24,23 +24,20 @@ export default {
 </script>
 
 <style lang="scss">
-$green: #EAF2F8;
+$blue: #EAF2F8;
 
-table {
+.stack {
+  thead, th, td {
+    border: 1px solid black;
+  }
+
   border-radius: 3px;
   background-color: #fff;
+  border-collapse: collapse;
 
   th {
-    background-color: $green;
+    background-color: $blue;
     color: black;
-
-    &.active {
-      color: white;
-    }
-
-    &.active .arrow {
-      opacity: 1;
-    }
   }
 
   td {
