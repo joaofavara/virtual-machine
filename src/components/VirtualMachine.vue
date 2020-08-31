@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 <template>
   <div class='main'>
+    <Modal ref="modal"/>
     <div class='menu'>
       <button class='debug' @click="setupExecutionData('DEBUG')">DEBUG</button>
       <button class='run' @click="setupExecutionData('RUN')">RUN</button>
@@ -65,12 +66,13 @@
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
 import Table from './Table.vue';
 import TableStack from './TableStack.vue';
+import Modal from './Modal.vue';
 import Mixin from '../mixin/mixin';
 
 export default {
@@ -79,6 +81,7 @@ export default {
   components: {
     Table,
     TableStack,
+    Modal,
   },
   data() {
     return {
@@ -128,7 +131,6 @@ export default {
     },
     setupExecutionData(typeExecution) {
       this.executeData.state = typeExecution;
-
       this.execute(false);
     },
     executeLine() {
@@ -287,6 +289,7 @@ export default {
 
         case 'HLT':
           this.loop = false;
+          this.$refs.modal.showModal();
           break;
 
         case 'STR':
