@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table class="program">
     <thead>
       <tr>
         <th v-for="column in columns" :key="column">{{ column }}</th>
@@ -38,44 +38,43 @@ $green: #EAF2F8;
 $red: #FFE4E1;
 $blue: #E0FFFF;
 
-table {
-  border-radius: 3px;
-  background-color: #fff;
-
-  th {
-    background-color: $green;
-    color: black;
-
-    &.active {
-      color: white;
+  .program {
+    thead, th, td {
+      border: 1px solid black;
     }
 
-    &.active .arrow {
-      opacity: 1;
+    table {
+      border-radius: 3px;
+      background-color: #fff;
+      border-collapse: collapse;
+
+      th {
+        background-color: $green;
+        color: black;
+      }
+
+      tr {
+        td {
+          background-color: white;
+
+          &.selected {
+            background-color: $red;
+          }
+
+          &.running {
+            background-color: $blue;
+          }
+
+          &.selected.running:first-child {
+            background-color: $red;
+          }
+        }
+      }
+
+      th, td {
+        min-width: 120px;
+        padding: 10px 20px;
+      }
     }
   }
-
-  tr {
-    td {
-      background-color: white;
-
-      &.selected {
-        background-color: $red;
-      }
-
-      &.running {
-        background-color: $blue;
-      }
-
-      &.selected.running:first-child {
-        background-color: $red;
-      }
-    }
-  }
-
-  th, td {
-    min-width: 120px;
-    padding: 10px 20px;
-  }
-}
 </style>

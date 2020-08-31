@@ -1,14 +1,19 @@
 /* eslint-disable max-len */
 <template>
   <div class='main'>
+    <Modal ref="modal"/>
     <div class='menu'>
-      <button class='debug' @click="setupExecutionData('DEBUG')">DEBUG</button>
-      <button class='run' @click="setupExecutionData('RUN')">RUN</button>
+      <button class='debug' @click="setupExecutionData('DEBUG')" :disabled="isDisabled">
+        DEBUG
+      </button>
+      <button class='run' @click="setupExecutionData('RUN')" :disabled="isDisabled">
+        RUN
+      </button>
       <input type="file" @change="previewFiles" class='file'>
     </div>
     <div class='program'>
       <p class='title'>Program Stack</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <Table
           :data='programData'
           :columns='programColumns'
@@ -20,17 +25,17 @@
     </div>
     <div class='data'>
       <p class='title'>Stack Content</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
     <div class='input'>
-      <!-- eslint-disable-next-line max-len -->
-      <p v-bind:style="[ isInput ? { background: 'cyan' } : { background: 'lightGrey' } ]" class='title'>Input Area</p>
-      <!-- eslint-disable-next-line max-len -->
-      <div v-bind:style="[ isInput ? { background: 'cyan', borderColor: 'cyan'} : { background: 'lightGrey', borderColor: 'lightGrey', } ]" class="content">
+      <p :class="{ isInput: isInput }" class='title'>
+        Input Area
         <input v-model="inputData" placeholder="Entre com um valor"/>
-        <button @click="execute(true)">Go</button>
+        <button @click="execute(true)" :disabled="!isInput">Go</button>
+      </p>
+      <div :class="{ isInput: isInput }" class="content">
         <div class="show-data">
           <span v-for="data in allInputedData" :key="data">{{ data }}</span>
         </div>
@@ -38,7 +43,7 @@
     </div>
     <div class='output'>
       <p class='title'>Output Area</p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <div class="show-data">
           <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
         </div>
@@ -47,17 +52,17 @@
     <div class='debbug'>
       <p class='title'>
         Break Points
-        <button @click="setupExecutionData('DEBUG')">
+        <button @click="setupExecutionData('DEBUG')" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
         </button>
-        <button @click="executeLine()">
+        <button @click="executeLine()" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/redo-24px.svg" />
         </button>
-        <button @click="setupExecutionData('RUN')">
+        <button @click="setupExecutionData('RUN')" :disabled="!isDebuging">
           <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
         </button>
       </p>
-      <div v-bind:style="{background:'white'}" class="content">
+      <div class="content">
         <div class="show-data">
           <span v-for="(data, index) in breakpoints" :key="index">
             {{ data }}
@@ -65,12 +70,13 @@
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
 import Table from './Table.vue';
 import TableStack from './TableStack.vue';
+import Modal from './Modal.vue';
 import Mixin from '../mixin/mixin';
 
 export default {
@@ -79,6 +85,7 @@ export default {
   components: {
     Table,
     TableStack,
+    Modal,
   },
   data() {
     return {
@@ -105,6 +112,12 @@ export default {
     breakpoints() {
       return this.isSelectedRow.map((row, index) => (row ? this.programData[index].Posicao : null));
     },
+    isDebuging() {
+      return this.executeData.state === 'DEBUG';
+    },
+    isDisabled() {
+      return this.executeData.state !== '';
+    },
   },
   methods: {
     addInputedData() {
@@ -128,7 +141,6 @@ export default {
     },
     setupExecutionData(typeExecution) {
       this.executeData.state = typeExecution;
-
       this.execute(false);
     },
     executeLine() {
@@ -287,6 +299,7 @@ export default {
 
         case 'HLT':
           this.loop = false;
+          this.$refs.modal.showModal();
           break;
 
         case 'STR':
@@ -394,6 +407,20 @@ body {
       'program    program   program        data'
       'input      output    debbug   data';
 
+    .title {
+      background-color: $gray;
+      border-radius: 8px 8px 0 0;
+      width: fit-content;
+      padding: 8px;
+      margin: 0;
+    }
+
+    .content {
+      border: $gray solid 10px;
+      border-radius: 0 8px 8px 8px;
+      background-color: white;
+    }
+
     .program {
       grid-area: program;
       .content {
@@ -404,6 +431,11 @@ body {
 
     .input {
       grid-area: input;
+
+      .isInput {
+        background: cyan;
+        border-color: cyan;
+      }
 
       .show-data {
         margin-top: 10px;
@@ -428,7 +460,6 @@ body {
       grid-area: output;
 
       .show-data {
-        margin-top: 10px;
         background: white;
         width: 100%;
         display: flex;
@@ -466,7 +497,6 @@ body {
       grid-area: debbug;
 
       .show-data {
-        margin-top: 10px;
         background: white;
         width: 100%;
         display: flex;
@@ -475,30 +505,6 @@ body {
         overflow: auto;
       }
     }
-
-    .title {
-      background-color: $gray;
-      border-radius: 8px 8px 0 0;
-      width: fit-content;
-      padding: 8px;
-      margin: 0;
-    }
-
-    .content {
-      border: $gray solid 10px;
-      border-radius: 0 8px 8px 8px;
-    }
   }
-
-  // @media (max-width: 600px) {
-  //   .main {
-  //    grid-template-areas:
-  //     'menu       .'
-  //     'program    program'
-  //     'program    program'
-  //     'input      output'
-  //     'debbug     data';
-  //   }
-  // }
 }
 </style>
