@@ -82,14 +82,14 @@ const mixin = {
       }
 
       while (this.loop && this.i < this.programData.length) {
-        console.log(`-- Linha ${this.i + 1} ---`);
-        console.log(`Ponteiro: ${this.s}`);
-        console.log(`Instrucao: ${this.programData[this.i].Instrucao}`);
-        console.log(`Atributo1: ${this.programData[this.i].Atributo1}`);
-        console.log(`Atributo2: ${this.programData[this.i].Atributo2}`);
-        console.log(`executionRow: ${this.executionRow[this.i]}`);
-        console.log(this.stackData.flat());
-        console.log(`-- Linha ${this.i + 1} ---\n\n`);
+        // console.log(`-- Linha ${this.i + 1} ---`);
+        // console.log(`Ponteiro: ${this.s}`);
+        // console.log(`Instrucao: ${this.programData[this.i].Instrucao}`);
+        // console.log(`Atributo1: ${this.programData[this.i].Atributo1}`);
+        // console.log(`Atributo2: ${this.programData[this.i].Atributo2}`);
+        // console.log(`executionRow: ${this.executionRow[this.i]}`);
+        // console.log(this.stackData.flat());
+        // console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
         this.executeLine();
         if (this.executeData.state === 'DEBUG' && !this.isInput && this.programData[this.lastRow].breakpoint) {

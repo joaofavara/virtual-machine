@@ -135,7 +135,7 @@ export default {
       });
     },
     changeToSelectedRow(index) {
-      console.log('index: ', index);
+      // console.log('index: ', index);
       this.isSelectedRow[index] = !this.isSelectedRow[index];
       this.programData[index].breakpoint = !this.programData[index].breakpoint;
     },
