@@ -6,6 +6,6 @@ const app = express();
 
 app.use('/', serverStatic(path.join(__dirname, '/dist')));
 
-app.listen(3000, () => {
-  console.log('App is running at 3000');
-});
+const port = process.env.PORT || 5000;
+app.listen(port);
+console.log(`server started ${port}`);
