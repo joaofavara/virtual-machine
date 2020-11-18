@@ -2,6 +2,7 @@
 // eslint-disable-next-line max-len
 
 // import { forEach } from 'core-js/fn/array';
+// import axios from 'axios';
 
 const mixin = {
   data() {
@@ -30,21 +31,23 @@ const mixin = {
   methods: {
     setUpDefaultArray(commands) {
       this.isSelectedRow = commands.map(() => false);
+      console.log('this.isSelectedRow: ', this.isSelectedRow);
       this.executionRow = commands.map(() => false);
+      console.log('this.executionRow: ', this.executionRow);
     },
     parseCommand(command) {
       const commandSplited = command.split('#');
       const commandPart = commandSplited[0].split(' ') || '';
-      const comentario = commandSplited[1] || '';
-      const instrucao = commandPart[0].trim() || '';
+      const Comentario = commandSplited[1] || '';
+      const Instrucao = commandPart[0].trim() || '';
       const atributos = commandPart[1] ? commandPart[1].trim() : '';
-      const [atributo1, atributo2] = atributos ? atributos.split(',') : ['', ''];
+      const [Atributo1, Atributo2] = atributos ? atributos.split(',') : ['', ''];
       const breakpoint = false;
       return {
-        instrucao,
-        atributo1,
-        atributo2,
-        comentario,
+        Instrucao,
+        Atributo1,
+        Atributo2,
+        Comentario,
         breakpoint,
       };
     },
@@ -57,20 +60,29 @@ const mixin = {
             ...this.parseCommand(command),
           },
         );
-
         countPosicao += 1;
       });
+      console.log('this.programData: ', this.programData);
     },
     async previewFiles(event) {
+      // const result = await axios.get(`http://localhost:5000/read_file?file=${event.target.files[0].path}`);
+      // this.commands = await result.data.codigo.split(/\n/);
+      // console.log('result: ', this.commands);
+      // this.setUpDefaultArray(this.commands);
+      // this.buildProgramData();
+
       const file = event.target.files[0];
       const reader = new FileReader();
-      await reader.readAsText(file);
 
-      reader.onloadend = async () => {
-        this.commands = await reader.result.split('\n');
+      reader.onload = (evt) => {
+        console.log('evt.target: ', evt.target);
+        this.commands = evt.target.result.split(/\r\n/);
+        console.log('this.commands: ', typeof (this.commands));
         this.setUpDefaultArray(this.commands);
         this.buildProgramData();
       };
+
+      await reader.readAsText(file);
     },
     execute(isInput) {
       this.loop = true;
@@ -82,14 +94,14 @@ const mixin = {
       }
 
       while (this.loop && this.i < this.programData.length) {
-        // console.log(`-- Linha ${this.i + 1} ---`);
-        // console.log(`Ponteiro: ${this.s}`);
-        // console.log(`Instrucao: ${this.programData[this.i].Instrucao}`);
-        // console.log(`Atributo1: ${this.programData[this.i].Atributo1}`);
-        // console.log(`Atributo2: ${this.programData[this.i].Atributo2}`);
-        // console.log(`executionRow: ${this.executionRow[this.i]}`);
-        // console.log(this.stackData.flat());
-        // console.log(`-- Linha ${this.i + 1} ---\n\n`);
+        console.log(`-- Linha ${this.i + 1} ---`);
+        console.log(`Ponteiro: ${this.s}`);
+        console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
+        console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
+        console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
+        console.log(`executionRow: ${this.executionRow[this.i]}`);
+        console.log(this.stackData.flat());
+        console.log(`-- Linha ${this.i + 1} ---\n\n`);
 
         this.executeLine();
         if (this.executeData.state === 'DEBUG' && !this.isInput && this.programData[this.lastRow].breakpoint) {
