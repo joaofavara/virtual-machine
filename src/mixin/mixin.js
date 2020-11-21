@@ -75,8 +75,7 @@ const mixin = {
       const reader = new FileReader();
 
       reader.onload = (evt) => {
-        console.log('evt.target: ', evt.target);
-        this.commands = evt.target.result.split(/\r\n/);
+        this.commands = evt.target.result.split(/\n/);
         console.log('this.commands: ', typeof (this.commands));
         this.setUpDefaultArray(this.commands);
         this.buildProgramData();
