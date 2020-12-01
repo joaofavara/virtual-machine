@@ -405,7 +405,7 @@ body {
       'menu       .         .        .'
       'program    program   program        data'
       'program    program   program        data'
-      'input      output    debbug   data';
+      'input      output    debbug         data';
 
     .title {
       background-color: $gray;
@@ -419,53 +419,66 @@ body {
       border: $gray solid 10px;
       border-radius: 0 8px 8px 8px;
       background-color: white;
+      height: calc(100% - 69px);
     }
 
     .program {
       grid-area: program;
       .content {
-        height: 220px;
+        height: 100%;
         overflow: auto;
       }
     }
 
     .input {
       grid-area: input;
+      margin-top: 50px;
 
       .isInput {
         background: cyan;
         border-color: cyan;
       }
 
-      .show-data {
-        margin-top: 10px;
-        background: white;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        height: 125px;
-        overflow: auto;
-      }
+     .content {
+        height: calc(100% - 59px);
+
+        .show-data {
+          margin-top: 10px;
+          background: white;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          height: 145px;
+          overflow: auto;
+        }
+     }
+
     }
 
     .data {
       grid-area: data;
+
       .content {
-        height: 490px;
+        height: calc(100% - 55px);
         overflow: auto;
       }
     }
 
     .output {
       grid-area: output;
+      margin-top: 50px;
 
-      .show-data {
-        background: white;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        height: 145px;
-        overflow: auto;
+      .content {
+        height: calc(100% - 55px);
+
+        .show-data {
+          background: white;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          // height: 155px;
+          overflow: auto;
+        }
       }
     }
 
@@ -495,14 +508,18 @@ body {
 
     .debbug {
       grid-area: debbug;
+      margin-top: 50px;
 
-      .show-data {
-        background: white;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        height: 125px;
-        overflow: auto;
+      .content {
+        height: calc(100% - 70px);
+
+        .show-data {
+          background: white;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          overflow: auto;
+        }
       }
     }
   }
