@@ -48,7 +48,6 @@ const mixin = {
     },
     buildProgramData() {
       let countPosicao = 1;
-      this.programData = [];
       this.commands.forEach((command) => {
         this.programData.push(
           {
@@ -60,6 +59,11 @@ const mixin = {
       });
     },
     async previewFiles(event) {
+      this.programData = [];
+      this.allInputedData = [];
+      this.allOutputedData = [];
+      this.breakpoints = [];
+      this.executeData.state = '';
       const file = event.target.files[0];
       const reader = new FileReader();
 
