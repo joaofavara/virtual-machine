@@ -1,9 +1,6 @@
 /* eslint-disable max-len */
 // eslint-disable-next-line max-len
 
-// import { forEach } from 'core-js/fn/array';
-// import axios from 'axios';
-
 const mixin = {
   data() {
     return {
@@ -31,9 +28,7 @@ const mixin = {
   methods: {
     setUpDefaultArray(commands) {
       this.isSelectedRow = commands.map(() => false);
-      console.log('this.isSelectedRow: ', this.isSelectedRow);
       this.executionRow = commands.map(() => false);
-      console.log('this.executionRow: ', this.executionRow);
     },
     parseCommand(command) {
       const commandSplited = command.split('#');
@@ -62,15 +57,13 @@ const mixin = {
         );
         countPosicao += 1;
       });
-      console.log('this.programData: ', this.programData);
     },
     async previewFiles(event) {
-      // const result = await axios.get(`http://localhost:5000/read_file?file=${event.target.files[0].path}`);
-      // this.commands = await result.data.codigo.split(/\n/);
-      // console.log('result: ', this.commands);
-      // this.setUpDefaultArray(this.commands);
-      // this.buildProgramData();
-
+      this.programData = [];
+      this.allInputedData = [];
+      this.allOutputedData = [];
+      this.breakpoints = [];
+      this.executeData.state = '';
       const file = event.target.files[0];
       const reader = new FileReader();
 
@@ -93,15 +86,6 @@ const mixin = {
       }
 
       while (this.loop && this.i < this.programData.length) {
-        console.log(`-- Linha ${this.i + 1} ---`);
-        console.log(`Ponteiro: ${this.s}`);
-        console.log(`Instrucao: ${this.programData[this.i].instrucao}`);
-        console.log(`Atributo1: ${this.programData[this.i].atributo1}`);
-        console.log(`Atributo2: ${this.programData[this.i].atributo2}`);
-        console.log(`executionRow: ${this.executionRow[this.i]}`);
-        console.log(this.stackData.flat());
-        console.log(`-- Linha ${this.i + 1} ---\n\n`);
-
         this.executeLine();
         if (this.executeData.state === 'DEBUG' && !this.isInput && this.programData[this.lastRow].breakpoint) {
           break;
