@@ -59,11 +59,29 @@ const mixin = {
       });
     },
     async previewFiles(event) {
+      this.lastRow = -1;
+      this.isInput = false;
+      this.inputFile = '';
+      this.inputData = '';
+      this.allInputedData = [];
+      this.allOutputedData = [];
       this.programData = [];
       this.allInputedData = [];
       this.allOutputedData = [];
       this.breakpoints = [];
-      this.executeData.state = '';
+      this.loop = true;
+      this.isSelectedRow = [];
+      this.executionRow = [];
+      this.commands = null;
+      this.i = 0; /* Indice da fila de comandos */
+      this.s = 0;
+      this.programData = [];
+      this.stackData = []; /* Pilha de dados */
+      this.executeData = {
+        state: '',
+        nextLine: false,
+      };
+
       const file = event.target.files[0];
       const reader = new FileReader();
 
