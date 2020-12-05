@@ -29,44 +29,47 @@
         <TableStack :data='stackData' :columns='stackColumns' />
       </div>
     </div>
-    <div class='input'>
-      <p :class="{ isInput: isInput }" class='title'>
-        Input Area
-        <input v-model="inputData" placeholder="Entre com um valor"/>
-        <button @click="execute(true)" :disabled="!isInput">Go</button>
-      </p>
-      <div :class="{ isInput: isInput }" class="content">
-        <div class="show-data">
-          <span v-for="data in allInputedData" :key="data">{{ data }}</span>
+
+    <div class="organize">
+      <div class='input'>
+        <p :class="{ isInput: isInput }" class='title'>
+          Input Area
+          <input v-model="inputData" placeholder="Entre com um valor"/>
+          <button @click="execute(true)" :disabled="!isInput">Go</button>
+        </p>
+        <div :class="{ isInput: isInput }" class="content">
+          <div class="show-data">
+            <span v-for="data in allInputedData" :key="data">{{ data }}</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class='output'>
-      <p class='title'>Output Area</p>
-      <div class="content">
-        <div class="show-data">
-          <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
+      <div class='output'>
+        <p class='title'>Output Area</p>
+        <div class="content">
+          <div class="show-data">
+            <span v-for="data in allOutputedData" :key="data">{{ data }}</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class='debbug'>
-      <p class='title'>
-        Break Points
-        <button @click="setupExecutionData('DEBUG')" :disabled="!isDebuging">
-          <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
-        </button>
-        <button @click="executeLine()" :disabled="!isDebuging">
-          <img type="image/svg+xml" src="../assets/redo-24px.svg" />
-        </button>
-        <button @click="setupExecutionData('RUN')" :disabled="!isDebuging">
-          <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
-        </button>
-      </p>
-      <div class="content">
-        <div class="show-data">
-          <span v-for="(data, index) in breakpoints" :key="index">
-            {{ data }}
-          </span>
+      <div class='debbug'>
+        <p class='title'>
+          Break Points
+          <button @click="setupExecutionData('DEBUG')" :disabled="!isDebuging">
+            <img type="image/svg+xml" src="../assets/play_circle_outline-24px.svg" />
+          </button>
+          <button @click="executeLine()" :disabled="!isDebuging">
+            <img type="image/svg+xml" src="../assets/redo-24px.svg" />
+          </button>
+          <button @click="setupExecutionData('RUN')" :disabled="!isDebuging">
+            <img type="image/svg+xml" src="../assets/not_interested-24px.svg" />
+          </button>
+        </p>
+        <div class="content">
+          <div class="show-data">
+            <span v-for="(data, index) in breakpoints" :key="index">
+              {{ data }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -135,7 +138,6 @@ export default {
       });
     },
     changeToSelectedRow(index) {
-      // console.log('index: ', index);
       this.isSelectedRow[index] = !this.isSelectedRow[index];
       this.programData[index].breakpoint = !this.programData[index].breakpoint;
     },
@@ -300,6 +302,8 @@ export default {
         case 'HLT':
           this.loop = false;
           this.$refs.modal.showModal();
+          this.executeData.state = '';
+          this.executeData.nextLine = false;
           break;
 
         case 'STR':
@@ -405,7 +409,33 @@ body {
       'menu       .         .        .'
       'program    program   program        data'
       'program    program   program        data'
-      'input      output    debbug         data';
+      'organize   organize  organize       data';
+
+    .menu {
+      grid-area: menu;
+      display: flex;
+      justify-content: space-evenly;
+      width: 500px;
+
+      input[type="file"]::-webkit-file-upload-button {
+        padding: 5px;
+        border-radius: 8px;
+        background-color: $green;
+      }
+
+      button {
+        padding: 5px;
+        border-radius: 8px;
+
+        &.run {
+          background-color: $blue;
+        }
+
+        &.debug {
+          background-color: $red;
+        }
+      }
+    }
 
     .title {
       background-color: $gray;
@@ -419,7 +449,7 @@ body {
       border: $gray solid 10px;
       border-radius: 0 8px 8px 8px;
       background-color: white;
-      height: calc(100% - 69px);
+      height: 200px;
     }
 
     .program {
@@ -430,29 +460,59 @@ body {
       }
     }
 
-    .input {
-      grid-area: input;
+    .organize {
+      grid-area: organize;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
       margin-top: 50px;
 
-      .isInput {
-        background: cyan;
-        border-color: cyan;
+      .input {
+        .isInput {
+          background: cyan;
+          border-color: cyan;
+        }
+
+        .content {
+          overflow:auto;
+
+          .show-data {
+            margin-top: 10px;
+            background: white;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            height: 145px;
+            overflow: auto;
+          }
+        }
       }
 
-     .content {
-        height: calc(100% - 59px);
-
-        .show-data {
-          margin-top: 10px;
-          background: white;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          height: 145px;
+      .output {
+        .content {
           overflow: auto;
-        }
-     }
 
+          .show-data {
+            background: white;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+          }
+        }
+      }
+
+      .debbug {
+        .content {
+          overflow: auto;
+
+          .show-data {
+            background: white;
+            width: 235px;
+            display: flex;
+            flex-direction: column;
+          }
+        }
+      }
     }
 
     .data {
@@ -464,64 +524,6 @@ body {
       }
     }
 
-    .output {
-      grid-area: output;
-      margin-top: 50px;
-
-      .content {
-        height: calc(100% - 55px);
-
-        .show-data {
-          background: white;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          // height: 155px;
-          overflow: auto;
-        }
-      }
-    }
-
-    .menu {
-      grid-area: menu;
-      display: flex;
-      justify-content: space-evenly;
-
-      input[type="file"]::-webkit-file-upload-button {
-        padding: 5px;
-        border-radius: 8px;
-        background-color: $green;
-      }
-
-      button {
-        padding: 5px;
-        border-radius: 8px;
-        &.run {
-          background-color: $blue;
-        }
-
-        &.debug {
-          background-color: $red;
-        }
-      }
-    }
-
-    .debbug {
-      grid-area: debbug;
-      margin-top: 50px;
-
-      .content {
-        height: calc(100% - 70px);
-
-        .show-data {
-          background: white;
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          overflow: auto;
-        }
-      }
-    }
   }
 }
 </style>
